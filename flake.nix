@@ -123,5 +123,8 @@
           ];
         };
         devShells.default = self.devShells.${system}.zonegen;
-      });
+      }) // {
+        overlays.zonegen = import ./nix/overlay.nix (import ./nix/builder.nix) crane fenix;
+        overlays.default = self.overlays.zonegen;
+      };
 }
