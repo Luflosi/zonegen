@@ -3,6 +3,6 @@ Upstream-Name: zonegen
 Upstream-Contact: Luflosi <zonegen@luflosi.de>
 Source: https://github.com/Luflosi/zonegen
 
-Files: *.lock
+Files: *.lock migrations/*.sql
 Copyright: 2024 Luflosi <zonegen@luflosi.de>
 License: CC0-1.0

@@ -10,6 +10,16 @@ license = "GPL-3.0-only"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "4.5", features = ["derive"] }
+error-chain = "0.12"
+futures = "0.3"
+indoc = "2.0"
+nom = "7.1"
+rustyline = "14.0"
+sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite" ] }
+tempfile-fast = "0.3"
+tldextract = "0.6"
+tokio = { version = "1", features = ["full"] }
 
 [lints.rust]
 unsafe_code = "forbid"
