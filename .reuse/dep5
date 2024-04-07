@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: zonegen
+Upstream-Contact: Luflosi <zonegen@luflosi.de>
+Source: https://github.com/Luflosi/zonegen
+
+Files: *.lock
+Copyright: 2024 Luflosi <zonegen@luflosi.de>
+License: CC0-1.0

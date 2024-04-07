@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonegen@luflosi.de>
+# SPDX-License-Identifier: GPL-3.0-only
+
 {
   description = "Build zonegen";
 
@@ -116,6 +119,15 @@
             partitions = 1;
             partitionType = "count";
           });
+
+          zonegen-reuse = pkgs.runCommand "run-reuse" {
+            src = ./.;
+            nativeBuildInputs = with pkgs; [ reuse ];
+          } ''
+            cd "$src"
+            reuse lint
+            touch "$out"
+          '';
         };
 
         packages = {
