@@ -119,18 +119,20 @@
         };
 
         packages = {
-          default = zonegen;
+          inherit zonegen;
+          default = self.packages.${system}.zonegen;
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
           zonegen-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {
             inherit cargoArtifacts;
           });
         };
 
-        apps.default = flake-utils.lib.mkApp {
+        apps.zonegen = flake-utils.lib.mkApp {
           drv = zonegen;
         };
+        apps.default = self.apps.${system}.zonegen;
 
-        devShells.default = craneLib.devShell {
+        devShells.zonegen = craneLib.devShell {
           # Inherit inputs from checks.
           checks = self.checks.${system};
 
@@ -142,5 +144,6 @@
             sqlx-cli
           ];
         };
+        devShells.default = self.devShells.${system}.zonegen;
       });
 }
