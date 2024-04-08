@@ -36,6 +36,38 @@
         "type": "github"
       }
     },
+    "dyndnsd": {
+      "inputs": {
+        "advisory-db": [
+          "advisory-db"
+        ],
+        "crane": [
+          "crane"
+        ],
+        "fenix": [
+          "fenix"
+        ],
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1712540027,
+        "narHash": "sha256-gvb8JS0cA5JOXJu9mFW1FBn3lRqdztWlXvCEyitMnuc=",
+        "owner": "Luflosi",
+        "repo": "dyndnsd",
+        "rev": "8dc92e5d15124b481fb74a4f62f47ba306d3d513",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Luflosi",
+        "repo": "dyndnsd",
+        "type": "github"
+      }
+    },
     "fenix": {
       "inputs": {
         "nixpkgs": [
@@ -95,6 +127,7 @@
       "inputs": {
         "advisory-db": "advisory-db",
         "crane": "crane",
+        "dyndnsd": "dyndnsd",
         "fenix": "fenix",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"
