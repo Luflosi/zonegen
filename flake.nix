@@ -112,7 +112,7 @@
 
         # NixOS tests don't run on macOS
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
-          dyndnsd-e2e-test = pkgs.testers.runNixOSTest (import ./nix/e2e-test.nix self);
+          zonegen-e2e-test = pkgs.testers.runNixOSTest (import ./nix/e2e-test.nix self);
         };
 
         packages = {
