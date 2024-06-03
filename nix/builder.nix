@@ -9,7 +9,7 @@
 rec {
   inherit (pkgs) lib;
 
-  craneLib = crane.lib.${system};
+  craneLib = crane.mkLib pkgs;
 
   sqlFilter = path: _type: null != builtins.match ".*sql$" path;
   sqlOrCargo = path: type: (sqlFilter path type) || (craneLib.filterCargoSources path type);
