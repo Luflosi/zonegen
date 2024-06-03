@@ -14,7 +14,7 @@ But `zonegen` does not have the capability to do so. This will instead be handle
 - Create a directory where you would like to store the generated zone files and the SQLite database
 - Call `zonegen` with the `--dir` argument and pass the path to the above directory
 - Use something like `update add sub.example.org. 300 IN A 1.2.3.4` for adding or changing a record
-- Use something like `update add sub.example.org. IN A` to remove the above record again
+- Use something like `update delete sub.example.org. IN A` to remove the above record again
 - Use the `send` command to commit the changes you've made so far to the database
 - Use the `quit` command or <kbd>ctrl</kbd>+<kbd>d</kbd> or <kbd>ctrl</kbd>+<kbd>c</kbd> to exit
 - Use the `help` command to see the valid commands
