@@ -13,7 +13,8 @@ self:
     systemd.services.create-bind-dyn-dir = {
       description = "Service that creates the directory for dynamic DNS zone files";
       before = [ "dyndnsd.service" "bind.service" ];
-      wantedBy = [ "dyndnsd.service" "bind.service" ];
+      requiredBy = [ "dyndnsd.service" "bind.service" ];
+      serviceConfig.Type = "oneshot";
       startLimitBurst = 1;
       script = ''
         mkdir -p '/var/lib/bind/dyn/'
