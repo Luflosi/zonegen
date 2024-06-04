@@ -113,6 +113,16 @@ self:
               };
             };
           };
+          bob = {
+            hash = "$argon2id$v=19$m=65536,t=3,p=1$cVV0AzdTOAMwAzhmRAM6Yl8QDm4$SC2GeQjXWT+gnYHp5MYFr4m2OxRevsohluqv3EPVgSY";
+            domains = {
+              "bob.example.org" = {
+                ttl = 300;
+                ipv6prefixlen = 48;
+                ipv6suffix = "0:0:0:1::7";
+              };
+            };
+          };
         };
       };
     };
@@ -140,11 +150,14 @@ self:
     machine.wait_for_unit("dyndnsd.service")
     machine.wait_for_unit("bind.service")
     machine.succeed("curl --fail-with-body -v 'http://[::1]:9841/update?user=alice&pass=123456&ipv4=2.3.4.5&ipv6=2:3:4:5:6:7:8:9'")
+    machine.succeed("curl --fail-with-body -v 'http://[::1]:9841/update?user=bob&pass=234567&ipv4=3.4.5.6&ipv6=3:4:5:6:7:8:9:0'")
     # Tell BIND to reload the zone file (use https://github.com/Luflosi/zonewatch in a real deployment, this also increments the serial number)
     machine.succeed("rndc reload example.org")
     query("example.org", "A", "2.3.4.5")
     query("example.org", "AAAA", "2:3:4:1::5")
     query("test.example.org", "A", "2.3.4.5")
     query("test.example.org", "AAAA", "2:3:4:1::6")
+    query("bob.example.org", "A", "3.4.5.6")
+    query("bob.example.org", "AAAA", "3:4:5:1::7")
   '';
 }
