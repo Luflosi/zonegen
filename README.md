@@ -10,7 +10,7 @@ But `zonegen` does not have the capability to do so. This will instead be handle
 
 
 ## Usage
-- Wait for the separate daemon to be written (as mentioned above) as this program is not super useful on its own.
+- Set up [zonewatch](https://github.com/Luflosi/zonewatch)
 - Create a directory where you would like to store the generated zone files and the SQLite database
 - Call `zonegen` with the `--dir` argument and pass the path to the above directory
 - Use something like `update add sub.example.org. 300 IN A 1.2.3.4` for adding or changing a record

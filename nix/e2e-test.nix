@@ -141,7 +141,7 @@ self:
     machine.wait_for_unit("dyndnsd.service")
     machine.wait_for_unit("bind.service")
     machine.succeed("curl --fail-with-body -v 'http://[::1]:9841/update?user=alice&pass=123456&ipv4=2.3.4.5&ipv6=2:3:4:5:6:7:8:9'")
-    # TODO: update serial number in zone file (I plan to do this with an external daemon)
+    # Tell BIND to reload the zone file (use https://github.com/Luflosi/zonewatch in a real deployment, this also increments the serial number)
     machine.succeed("rndc reload example.org")
     query("example.org", "A", "2.3.4.5")
     query("example.org", "AAAA", "2:3:4:1::5")
