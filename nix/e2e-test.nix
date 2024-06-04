@@ -92,7 +92,6 @@ self:
         update_program = {
           bin = "${pkgs.zonegen}/bin/zonegen";
           args = [ "--dir" "/var/lib/bind/dyn/" ];
-          initial_stdin = "drop\n";
           stdin_per_zone_update = "send\n";
           final_stdin = "quit\n";
           ipv4.stdin = "update add {domain}. {ttl} IN A {ipv4}\n";

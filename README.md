@@ -18,7 +18,6 @@ But `zonegen` does not have the capability to do so. This will instead be handle
 - Use the `send` command to commit the changes you've made so far to the database
 - Use the `quit` command or <kbd>ctrl</kbd>+<kbd>d</kbd> or <kbd>ctrl</kbd>+<kbd>c</kbd> to exit
 - Use the `help` command to see the valid commands
-- If you want to be more declarative and want to keep less state, use the `drop` command to first delete the data in every zone (but the list of zones is not deleted)
 
 
 ## Limitations
