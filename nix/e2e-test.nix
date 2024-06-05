@@ -9,7 +9,6 @@ self:
       self.inputs.dyndnsd.nixosModules.dyndnsd
     ];
 
-    users.groups.zonegen = {};
     systemd.services.create-bind-dyn-dir = {
       description = "Service that creates the directory for dynamic DNS zone files";
       before = [ "dyndnsd.service" "bind.service" ];
@@ -17,12 +16,12 @@ self:
       serviceConfig.Type = "oneshot";
       startLimitBurst = 1;
       script = ''
-        mkdir -p '/var/lib/bind/dyn/'
-        chgrp zonegen '/var/lib/bind/dyn/'
-        chmod 775 '/var/lib/bind/dyn/'
-        if ! [ -f "/var/lib/bind/dyn/example.org.zone" ]; then
+        mkdir -p '/var/lib/bind/zones/dyn/'
+        chgrp zonegen '/var/lib/bind/zones/dyn/'
+        chmod 775 '/var/lib/bind/zones/dyn/'
+        if ! [ -f "/var/lib/bind/zones/dyn/example.org.zone" ]; then
           # Create an initial file for BIND to read
-          touch '/var/lib/bind/dyn/example.org.zone'
+          touch '/var/lib/bind/zones/dyn/example.org.zone'
         fi
       '';
     };
@@ -32,22 +31,13 @@ self:
     # This is unfortunately not atomic.
     # This could be avoided if the tempfile-fast rust crate allowed ignoring the ownership of the old file.
     systemd.services.dyndnsd.preStart = ''
-      if ! [ -w '/var/lib/bind/dyn/example.org.zone' ]; then
+      if ! [ -w '/var/lib/bind/zones/dyn/example.org.zone' ]; then
         # Copy the file, changing ownership
-        cp '/var/lib/bind/dyn/example.org.zone' '/var/lib/bind/dyn/example.org.zone.tmp'
+        cp '/var/lib/bind/zones/dyn/example.org.zone' '/var/lib/bind/zones/dyn/example.org.zone.tmp'
         # Replace the old file
-        mv '/var/lib/bind/dyn/example.org.zone.tmp' '/var/lib/bind/dyn/example.org.zone'
+        mv '/var/lib/bind/zones/dyn/example.org.zone.tmp' '/var/lib/bind/zones/dyn/example.org.zone'
       fi
     '';
-
-    systemd.services.dyndnsd.serviceConfig = {
-      SupplementaryGroups = [ "zonegen" ];
-      ReadWritePaths = [ "/var/lib/bind/dyn/" ];
-
-      # The tempfile-fast rust crate tries to keep the old permissions, so we need to allow this class of system calls
-      SystemCallFilter = [ "@chown" ];
-      UMask = "0022"; # Allow all processes (including BIND) to read the zone files (and database)
-    };
 
     systemd.services.bind.preStart = let
       zoneFile = pkgs.writeText "root.zone" ''
@@ -62,7 +52,7 @@ self:
         1.0.0.127.in-addr.arpa IN PTR ns.example.org.
         1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa IN PTR ns.example.org.
 
-        $INCLUDE /var/lib/bind/dyn/example.org.zone
+        $INCLUDE /var/lib/bind/zones/dyn/example.org.zone
       '';
     in ''
       mkdir -p '/var/lib/bind/zones/example.org/'
@@ -88,15 +78,8 @@ self:
 
     services.dyndnsd = {
       enable = true;
+      useZonegen = true;
       settings = {
-        update_program = {
-          bin = "${pkgs.zonegen}/bin/zonegen";
-          args = [ "--dir" "/var/lib/bind/dyn/" ];
-          stdin_per_zone_update = "send\n";
-          final_stdin = "quit\n";
-          ipv4.stdin = "update add {domain}. {ttl} IN A {ipv4}\n";
-          ipv6.stdin = "update add {domain}. {ttl} IN AAAA {ipv6}\n";
-        };
         users = {
           alice = {
             hash = "$argon2id$v=19$m=65536,t=3,p=1$ZFRHDlJOQ3UNQRN7em14R08FIRE$0SqSQRj45ZBz1MfCPq9DVMWt7VSl96m7XtW6maIcUB0";
