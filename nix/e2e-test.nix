@@ -21,10 +21,9 @@ self:
       script = ''
         mkdir -p '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
-        if ! [ -f "/var/lib/bind/zones/dyn/example.org.zone" ]; then
-          # Create an initial file for BIND to read
-          touch '/var/lib/bind/zones/dyn/example.org.zone'
-        fi
+
+        # Create an initial file for BIND to read
+        (set -o noclobber;>'/var/lib/bind/zones/dyn/example.org.zone'||true) &>/dev/null
       '';
     };
 
