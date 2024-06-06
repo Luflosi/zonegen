@@ -13,11 +13,13 @@ self:
       description = "Service that creates the directory for dynamic DNS zone files";
       before = [ "dyndnsd.service" "bind.service" ];
       requiredBy = [ "dyndnsd.service" "bind.service" ];
-      serviceConfig.Type = "oneshot";
+      serviceConfig = {
+        Type = "oneshot";
+        Group = "zonegen";
+      };
       startLimitBurst = 1;
       script = ''
         mkdir -p '/var/lib/bind/zones/dyn/'
-        chgrp zonegen '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
         if ! [ -f "/var/lib/bind/zones/dyn/example.org.zone" ]; then
           # Create an initial file for BIND to read
