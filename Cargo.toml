@@ -25,7 +25,8 @@ tokio = { version = "1", features = ["full"] }
 unsafe_code = "forbid"
 
 [lints.clippy]
+doc_markdown = "allow"
 enum_glob_use = "warn"
-pedantic = "warn"
-nursery = "warn"
+nursery = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
 unwrap_used = "warn"
