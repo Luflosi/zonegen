@@ -130,7 +130,7 @@ self:
         machine.log(f"DNS server replied with {out}")
         assert expected == out, f"Expected `{expected}` but got `{out}`"
 
-    machine.start()
+    start_all()
     machine.wait_for_unit("dyndnsd.service")
     machine.wait_for_unit("bind.service")
     machine.succeed("curl --fail-with-body -v 'http://[::1]:9841/update?user=alice&pass=123456&ipv4=2.3.4.5&ipv6=2:3:4:5:6:7:8:9'")
