@@ -16,7 +16,7 @@ futures = "0.3"
 indoc = "2.0"
 nom = "7.1"
 rustyline = "14.0"
-sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite" ] }
+sqlx = { version = "0.8", features = [ "runtime-tokio", "sqlite" ] }
 tempfile-fast = "0.3"
 tldextract = "0.6"
 tokio = { version = "1", features = ["full"] }
