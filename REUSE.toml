@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonegen@luflosi.de>
+# SPDX-License-Identifier: CC0-1.0
+
+version = 1
+SPDX-PackageName = "zonegen"
+SPDX-PackageSupplier = "Luflosi <zonegen@luflosi.de>"
+SPDX-PackageDownloadLocation = "https://github.com/Luflosi/zonegen"
+
+[[annotations]]
+path = ["**.lock", "migrations/**.sql", ".github/renovate.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Luflosi <zonegen@luflosi.de>"
+SPDX-License-Identifier = "CC0-1.0"
