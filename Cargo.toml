@@ -11,7 +11,7 @@ license = "GPL-3.0-only"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
-error-chain = "0.12"
+color-eyre = "0.6"
 futures = "0.3"
 indoc = "2.0"
 nom = "7.1"

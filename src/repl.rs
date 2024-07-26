@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::db;
-use crate::errors::{Result, ResultExt};
 use crate::parse::{
 	parse, Command,
 	Update::{Add, Delete},
 };
+use color_eyre::eyre::{Result, WrapErr};
 use indoc::printdoc;
 use nom::error::convert_error;
 use rustyline::{error::ReadlineError, DefaultEditor};
@@ -19,13 +19,13 @@ pub async fn repl(pool: &Pool<Sqlite>) -> Result<()> {
 	let mut optional_tx: Option<Transaction<Sqlite>> = None;
 	let tld_ext = TldExtractor::new(TldOption::default());
 
-	let mut rl = DefaultEditor::new().chain_err(|| "Cannot create default editor")?;
+	let mut rl = DefaultEditor::new().wrap_err("Cannot create default editor")?;
 	loop {
 		let readline = rl.readline("❯ ");
 		match readline {
 			Ok(line) => {
 				rl.add_history_entry(line.as_str())
-					.chain_err(|| "Cannot add history entry for readline")?;
+					.wrap_err("Cannot add history entry for readline")?;
 				match line.as_str() {
 					"" => {} // Ignore empty inputs
 					non_empty_line => match parse(non_empty_line) {
@@ -55,7 +55,7 @@ pub async fn repl(pool: &Pool<Sqlite>) -> Result<()> {
 								.expect("a transaction should exist here");
 							db::drop(tx)
 								.await
-								.chain_err(|| "Cannot detete the contents of the database")?;
+								.wrap_err("Cannot detete the contents of the database")?;
 						}
 						Ok(Command::Update(Add(r))) => {
 							println!("Add request: {r:?}");
@@ -66,7 +66,7 @@ pub async fn repl(pool: &Pool<Sqlite>) -> Result<()> {
 								.expect("a transaction should exist here");
 							db::add(r, tx, &tld_ext)
 								.await
-								.chain_err(|| "Cannot add a record")?;
+								.wrap_err("Cannot add a record")?;
 						}
 						Ok(Command::Update(Delete(r))) => {
 							println!("Delete request: {r:?}");
@@ -77,11 +77,11 @@ pub async fn repl(pool: &Pool<Sqlite>) -> Result<()> {
 								.expect("a transaction should exist here");
 							db::delete(r, tx, &tld_ext)
 								.await
-								.chain_err(|| "Cannot delete a record")?;
+								.wrap_err("Cannot delete a record")?;
 						}
 						Err(e) => {
 							match e {
-								// TODO: somehow use chain_err() here?
+								// TODO: somehow use wrap_err_with() here?
 								nom::Err::Failure(f) => {
 									eprintln!("Failure: {f:?}");
 								}
@@ -101,7 +101,7 @@ pub async fn repl(pool: &Pool<Sqlite>) -> Result<()> {
 				break;
 			}
 			Err(e) => {
-				Err(e).chain_err(|| "Readline failed")?;
+				Err(e).wrap_err("Readline failed")?;
 				break;
 			}
 		}

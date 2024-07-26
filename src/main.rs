@@ -1,16 +1,9 @@
 // SPDX-FileCopyrightText: 2024 Luflosi <zonegen@luflosi.de>
 // SPDX-License-Identifier: GPL-3.0-only
 
-#[macro_use]
-extern crate error_chain;
-
-mod errors {
-	error_chain! {}
-}
-
 use crate::repl::repl;
 use clap::Parser;
-use errors::Result;
+use color_eyre::eyre::Result;
 
 mod db;
 mod parse;
@@ -36,20 +29,12 @@ async fn run(args: Args) -> Result<()> {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
+	color_eyre::install()?;
+
 	let args = Args::parse();
 
-	if let Err(e) = run(args).await {
-		eprintln!("Error: {e}");
+	run(args).await?;
 
-		for e in e.iter().skip(1) {
-			eprintln!("Caused by: {e}");
-		}
-
-		if let Some(backtrace) = e.backtrace() {
-			println!("Backtrace: {backtrace:?}");
-		}
-
-		std::process::exit(1);
-	};
+	Ok(())
 }

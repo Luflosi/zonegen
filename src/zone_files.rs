@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2024 Luflosi <zonegen@luflosi.de>
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::errors::{Result, ResultExt};
+use color_eyre::eyre::{Result, WrapErr};
 use std::{fs, io::Write, path::Path};
 use tempfile_fast::Sponge;
 
@@ -20,7 +20,7 @@ pub fn save(zone_name: &str, zone_data: &str, dir: &Path) -> Result<()> {
 			// Continue with saving the file
 		}
 		Err(e) => {
-			Err(e).chain_err(|| {
+			Err(e).wrap_err_with(|| {
 				format!(
 					"Cannot read existing zone file {}",
 					zone_file_path.display()
@@ -29,16 +29,16 @@ pub fn save(zone_name: &str, zone_data: &str, dir: &Path) -> Result<()> {
 		}
 	}
 	println!("File {} changed, saving file...", zone_file_path.display());
-	let mut temp = Sponge::new_for(&zone_file_path).chain_err(|| {
+	let mut temp = Sponge::new_for(&zone_file_path).wrap_err_with(|| {
 		format!(
 			"Cannot create new Sponge for writing to new zone file {}",
 			zone_file_path.display()
 		)
 	})?;
 	temp.write_all(zone_data.as_bytes())
-		.chain_err(|| format!("Cannot write to new zone file {}", zone_file_path.display()))?;
+		.wrap_err_with(|| format!("Cannot write to new zone file {}", zone_file_path.display()))?;
 
-	temp.commit().chain_err(|| {
+	temp.commit().wrap_err_with(|| {
 		format!(
 			"Cannot commit new zone file to the filesystem {}",
 			zone_file_path.display()
