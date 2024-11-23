@@ -21,6 +21,7 @@ self:
       script = ''
         mkdir -p '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
+        chgrp zonegen '/var/lib/bind/zones/dyn/'
 
         # Create an initial file for BIND to read
         (set -o noclobber;>'/var/lib/bind/zones/dyn/example.org.zone'||true) &>/dev/null
