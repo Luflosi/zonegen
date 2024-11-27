@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 {
-  description = "Build zonegen";
+  description = "Drop-in replacement for nsupdate but it doesn't rewrite your (hand-written, generated or otherwise externally managed) zone files";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
