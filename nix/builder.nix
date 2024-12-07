@@ -50,5 +50,6 @@ rec {
   # artifacts from above.
   zonegen = craneLib.buildPackage (commonArgs // {
     inherit cargoArtifacts;
+    meta.mainProgram = "zonegen";
   });
 }
