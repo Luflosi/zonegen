@@ -8,5 +8,5 @@ allow = [
   "GPL-3.0",
   "MIT",
   "Unicode-3.0",
-  "Unicode-DFS-2016",
+  "Zlib",
 ]
