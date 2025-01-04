@@ -41,6 +41,11 @@ self:
       fi
     '';
 
+    systemd.tmpfiles.settings."bind"."/var/lib/bind/zones/example.org/".d = {
+      user = "named";
+      group = "named";
+    };
+
     systemd.services.bind.preStart = let
       zoneFile = pkgs.writeText "root.zone" ''
         $ORIGIN example.org.
@@ -57,10 +62,7 @@ self:
         $INCLUDE /var/lib/bind/zones/dyn/example.org.zone
       '';
     in ''
-      mkdir -p '/var/lib/bind/zones/example.org/'
-      chown -R named '/var/lib/bind/zones/example.org/'
       cp '${zoneFile}' '/var/lib/bind/zones/example.org/root.zone'
-      chown named '/var/lib/bind/zones/example.org/root.zone'
     '';
 
     services.bind = {
