@@ -132,8 +132,10 @@
           });
         };
 
-        apps.zonegen = flake-utils.lib.mkApp {
+        apps.zonegen = (flake-utils.lib.mkApp {
           drv = zonegen;
+        }) // {
+          inherit (zonegen) meta;
         };
         apps.default = self.apps.${system}.zonegen;
 

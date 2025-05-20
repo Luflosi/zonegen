@@ -50,6 +50,9 @@ rec {
   # artifacts from above.
   zonegen = craneLib.buildPackage (commonArgs // {
     inherit cargoArtifacts;
-    meta.mainProgram = "zonegen";
+    meta = {
+      description = "A drop-in replacement for `nsupdate` but it doesn't rewrite your (hand-written, generated or otherwise externally managed) zone files";
+      mainProgram = "zonegen";
+    };
   });
 }
