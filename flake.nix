@@ -109,10 +109,10 @@
 
           zonegen-zizmor = pkgs.runCommand "run-zizmor" {
             # zizmor needs this folder structure for some reason
-            src = pkgs.linkFarm "repo" [{
-              name = ".github/workflows";
-              path = ./.github/workflows;
-            }];
+            src = lib.fileset.toSource {
+              root = ./.;
+              fileset = ./.github/workflows;
+            };
           } ''
             '${lib.getExe pkgs.zizmor}' --offline "$src"
             touch "$out"
