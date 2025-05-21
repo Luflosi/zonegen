@@ -8,7 +8,7 @@ use crate::parse::{
 };
 use color_eyre::eyre::{Result, WrapErr};
 use indoc::printdoc;
-use nom::error::convert_error;
+use nom_language::error::convert_error;
 use rustyline::{error::ReadlineError, DefaultEditor};
 use sqlx::{Pool, Sqlite, Transaction};
 use tldextract::{TldExtractor, TldOption};

@@ -4,13 +4,8 @@
 use nom::bytes::complete::take_while1;
 use nom::error::context;
 use nom::lib::std::result::Result::Err;
-use nom::{
-	branch::alt,
-	bytes::complete::tag,
-	error::{VerboseError, VerboseErrorKind},
-	sequence::tuple,
-	AsChar, Err as NomErr, IResult,
-};
+use nom::{branch::alt, bytes::complete::tag, AsChar, Err as NomErr, IResult, Parser};
+use nom_language::error::{VerboseError, VerboseErrorKind};
 
 type Res<T, U> = IResult<T, U, VerboseError<T>>;
 
@@ -49,38 +44,50 @@ fn command(input: &str) -> Res<&str, Command> {
 	context(
 		"command",
 		alt((help, send, quit, drop, update, add, delete)),
-	)(input)
+	)
+	.parse(input)
 }
 
 fn help(input: &str) -> Res<&str, Command> {
-	context("help", tag("help"))(input).map(|(next_input, _)| (next_input, Command::Help))
+	context("help", tag("help"))
+		.parse(input)
+		.map(|(next_input, _)| (next_input, Command::Help))
 }
 
 fn send(input: &str) -> Res<&str, Command> {
-	context("send", tag("send"))(input).map(|(next_input, _)| (next_input, Command::Send))
+	context("send", tag("send"))
+		.parse(input)
+		.map(|(next_input, _)| (next_input, Command::Send))
 }
 
 fn quit(input: &str) -> Res<&str, Command> {
-	context("quit", tag("quit"))(input).map(|(next_input, _)| (next_input, Command::Quit))
+	context("quit", tag("quit"))
+		.parse(input)
+		.map(|(next_input, _)| (next_input, Command::Quit))
 }
 
 fn drop(input: &str) -> Res<&str, Command> {
-	context("drop", tag("drop"))(input).map(|(next_input, _)| (next_input, Command::Drop))
+	context("drop", tag("drop"))
+		.parse(input)
+		.map(|(next_input, _)| (next_input, Command::Drop))
 }
 
 fn update(input: &str) -> Res<&str, Command> {
-	context("update", tuple((tag("update"), tag(" "), add_or_delete)))(input)
+	context("update", (tag("update"), tag(" "), add_or_delete))
+		.parse(input)
 		.map(|(next_input, (_, _, command))| (next_input, command))
 }
 
 fn ttl(input: &str) -> Res<&str, u32> {
 	let digits = take_while1(AsChar::is_dec_digit);
-	context("ttl", digits)(input).and_then(|(next_input, res)| {
-		res.parse::<u32>().map_or_else(
-			|_| Err(NomErr::Error(VerboseError { errors: vec![] })),
-			|n| Ok((next_input, n)),
-		)
-	})
+	context("ttl", digits)
+		.parse(input)
+		.and_then(|(next_input, res)| {
+			res.parse::<u32>().map_or_else(
+				|_| Err(NomErr::Error(VerboseError { errors: vec![] })),
+				|n| Ok((next_input, n)),
+			)
+		})
 }
 
 fn add(input: &str) -> Res<&str, Command> {
@@ -91,7 +98,7 @@ fn add(input: &str) -> Res<&str, Command> {
 	let data = take_while1(|c: char| c.is_ascii_graphic());
 	context(
 		"add",
-		tuple((
+		(
 			tag("add"),
 			tag(" "),
 			name,
@@ -103,8 +110,9 @@ fn add(input: &str) -> Res<&str, Command> {
 			type_,
 			tag(" "),
 			data,
-		)),
-	)(input)
+		),
+	)
+	.parse(input)
 	.map(
 		|(next_input, (_, _, name, _, ttl, _, class, _, type_, _, data))| {
 			(
@@ -128,7 +136,7 @@ fn delete(input: &str) -> Res<&str, Command> {
 	let type_ = take_while1(|c: char| c.is_ascii_uppercase());
 	context(
 		"delete",
-		tuple((
+		(
 			alt((tag("delete"), tag("del"))),
 			tag(" "),
 			name,
@@ -136,8 +144,9 @@ fn delete(input: &str) -> Res<&str, Command> {
 			class,
 			tag(" "),
 			type_,
-		)),
-	)(input)
+		),
+	)
+	.parse(input)
 	.map(|(next_input, (_, _, name, _, class, _, type_))| {
 		(
 			next_input,
@@ -147,7 +156,7 @@ fn delete(input: &str) -> Res<&str, Command> {
 }
 
 fn add_or_delete(input: &str) -> Res<&str, Command> {
-	context("add or delete", alt((add, delete)))(input)
+	context("add or delete", alt((add, delete))).parse(input)
 }
 
 pub fn parse(input: &str) -> Result<Command, NomErr<VerboseError<&str>>> {
@@ -168,8 +177,8 @@ pub fn parse(input: &str) -> Result<Command, NomErr<VerboseError<&str>>> {
 mod test {
 	use super::{add, command, delete, parse, Add, Command, Delete, Update};
 	use nom::error::ErrorKind;
-	use nom::error::{VerboseError, VerboseErrorKind};
 	use nom::Err as NomErr;
+	use nom_language::error::{VerboseError, VerboseErrorKind};
 
 	#[test]
 	fn command_token_test() {
