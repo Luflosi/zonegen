@@ -82,7 +82,7 @@ pub async fn optionally_commit_transaction(
 ) -> Result<Option<Transaction<'_, Sqlite>>> {
 	if let Some(tx) = optional_tx {
 		tx.commit().await.wrap_err("Cannot commit transaction")?;
-	};
+	}
 	Ok(None)
 }
 
@@ -94,7 +94,7 @@ pub async fn optionally_rollback_transaction(
 			.await
 			.wrap_err("Cannot roll back transaction")?;
 		eprintln!("WARNING: discarding changes");
-	};
+	}
 	Ok(None)
 }
 
@@ -160,7 +160,7 @@ pub async fn add(
 			.await
 			.wrap_err("Cannot INSERT row into records table")?;
 		}
-	};
+	}
 
 	Ok(())
 }

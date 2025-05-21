@@ -92,10 +92,10 @@ pub async fn repl(pool: &Pool<Sqlite>) -> Result<()> {
 									// Print a hopefully nicer error message
 									eprintln!("{}", convert_error(non_empty_line, f));
 								}
-							};
+							}
 						}
 					},
-				};
+				}
 			}
 			Err(ReadlineError::Interrupted | ReadlineError::Eof) => {
 				break;

@@ -14,7 +14,7 @@ pub fn save(zone_name: &str, zone_data: &str, dir: &Path) -> Result<()> {
 			if previous_zone_data == zone_data {
 				println!("File {} did not change, ignoring", zone_file_path.display());
 				return Ok(()); // Nothing to be done
-			};
+			}
 		}
 		Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
 			// Continue with saving the file
