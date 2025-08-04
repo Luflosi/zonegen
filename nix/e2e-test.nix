@@ -17,7 +17,6 @@ self:
         Type = "oneshot";
         Group = "zonegen";
       };
-      startLimitBurst = 1;
       script = ''
         mkdir -p '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
@@ -118,7 +117,9 @@ self:
       pkgs.dig.out      # Make the `rndc` command available in the test script
     ];
   };
-  testScript = ''
+  testScript = let
+    curl-cmd = "sudo -u dyndnsd -g dyndnsd curl --fail-with-body -v --unix-socket /run/dyndnsd.sock";
+  in ''
     def query(
         query: str,
         query_type: str,
@@ -134,10 +135,9 @@ self:
         assert expected == out, f"Expected `{expected}` but got `{out}`"
 
     start_all()
-    machine.wait_for_unit("dyndnsd.service")
     machine.wait_for_unit("bind.service")
-    machine.succeed("curl --fail-with-body -v 'http://[::1]:9841/update?user=alice&pass=123456&ipv4=2.3.4.5&ipv6=2:3:4:5:6:7:8:9'")
-    machine.succeed("curl --fail-with-body -v 'http://[::1]:9841/update?user=bob&pass=234567&ipv4=3.4.5.6&ipv6=3:4:5:6:7:8:9:0'")
+    machine.succeed("${curl-cmd} 'http://[::1]:9841/update?user=alice&pass=123456&ipv4=2.3.4.5&ipv6=2:3:4:5:6:7:8:9'")
+    machine.succeed("${curl-cmd} 'http://[::1]:9841/update?user=bob&pass=234567&ipv4=3.4.5.6&ipv6=3:4:5:6:7:8:9:0'")
     # Tell BIND to reload the zone file (use https://github.com/Luflosi/zonewatch in a real deployment, this also increments the serial number)
     machine.succeed("rndc reload example.org")
     query("example.org", "A", "2.3.4.5")
