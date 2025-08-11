@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2024 Luflosi <zonegen@luflosi.de>
 // SPDX-License-Identifier: GPL-3.0-only
 
+use atomic_write_file::{unix::OpenOptionsExt as AtomicOpenOptionsExt, AtomicWriteFile};
 use color_eyre::eyre::{Result, WrapErr};
-use std::{fs, io::Write, path::Path};
-use tempfile_fast::Sponge;
+use std::{fs, io::Write, os::unix::fs::OpenOptionsExt as UnixOpenOptionsExt, path::Path};
 
 pub fn save(zone_name: &str, zone_data: &str, dir: &Path) -> Result<()> {
 	let zone_file_name = format!("{zone_name}.zone");
@@ -29,16 +29,21 @@ pub fn save(zone_name: &str, zone_data: &str, dir: &Path) -> Result<()> {
 		}
 	}
 	println!("File {} changed, saving file...", zone_file_path.display());
-	let mut temp = Sponge::new_for(&zone_file_path).wrap_err_with(|| {
-		format!(
-			"Cannot create new Sponge for writing to new zone file {}",
-			zone_file_path.display()
-		)
-	})?;
-	temp.write_all(zone_data.as_bytes())
+	let mut file = AtomicWriteFile::options()
+		.preserve_mode(false)
+		.preserve_owner(false)
+		.mode(0o444) // Only allow reading, not writing
+		.open(&zone_file_path)
+		.wrap_err_with(|| {
+			format!(
+				"Cannot open the new zone file {} using AtomicWriteFile",
+				zone_file_path.display()
+			)
+		})?;
+	file.write_all(zone_data.as_bytes())
 		.wrap_err_with(|| format!("Cannot write to new zone file {}", zone_file_path.display()))?;
 
-	temp.commit().wrap_err_with(|| {
+	file.commit().wrap_err_with(|| {
 		format!(
 			"Cannot commit new zone file to the filesystem {}",
 			zone_file_path.display()
