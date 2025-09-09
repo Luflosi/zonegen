@@ -40,7 +40,7 @@ pub struct Delete<'a> {
 	pub type_: &'a str,
 }
 
-fn command(input: &str) -> Res<&str, Command> {
+fn command(input: &str) -> Res<&str, Command<'_>> {
 	context(
 		"command",
 		alt((help, send, quit, drop, update, add, delete)),
@@ -48,31 +48,31 @@ fn command(input: &str) -> Res<&str, Command> {
 	.parse(input)
 }
 
-fn help(input: &str) -> Res<&str, Command> {
+fn help(input: &str) -> Res<&str, Command<'_>> {
 	context("help", tag("help"))
 		.parse(input)
 		.map(|(next_input, _)| (next_input, Command::Help))
 }
 
-fn send(input: &str) -> Res<&str, Command> {
+fn send(input: &str) -> Res<&str, Command<'_>> {
 	context("send", tag("send"))
 		.parse(input)
 		.map(|(next_input, _)| (next_input, Command::Send))
 }
 
-fn quit(input: &str) -> Res<&str, Command> {
+fn quit(input: &str) -> Res<&str, Command<'_>> {
 	context("quit", tag("quit"))
 		.parse(input)
 		.map(|(next_input, _)| (next_input, Command::Quit))
 }
 
-fn drop(input: &str) -> Res<&str, Command> {
+fn drop(input: &str) -> Res<&str, Command<'_>> {
 	context("drop", tag("drop"))
 		.parse(input)
 		.map(|(next_input, _)| (next_input, Command::Drop))
 }
 
-fn update(input: &str) -> Res<&str, Command> {
+fn update(input: &str) -> Res<&str, Command<'_>> {
 	context("update", (tag("update"), tag(" "), add_or_delete))
 		.parse(input)
 		.map(|(next_input, (_, _, command))| (next_input, command))
@@ -90,7 +90,7 @@ fn ttl(input: &str) -> Res<&str, u32> {
 		})
 }
 
-fn add(input: &str) -> Res<&str, Command> {
+fn add(input: &str) -> Res<&str, Command<'_>> {
 	let name =
 		take_while1(|c: char| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.');
 	let class = take_while1(|c: char| c.is_ascii_uppercase());
@@ -129,7 +129,7 @@ fn add(input: &str) -> Res<&str, Command> {
 	)
 }
 
-fn delete(input: &str) -> Res<&str, Command> {
+fn delete(input: &str) -> Res<&str, Command<'_>> {
 	let name =
 		take_while1(|c: char| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.');
 	let class = take_while1(|c: char| c.is_ascii_uppercase());
@@ -155,11 +155,11 @@ fn delete(input: &str) -> Res<&str, Command> {
 	})
 }
 
-fn add_or_delete(input: &str) -> Res<&str, Command> {
+fn add_or_delete(input: &str) -> Res<&str, Command<'_>> {
 	context("add or delete", alt((add, delete))).parse(input)
 }
 
-pub fn parse(input: &str) -> Result<Command, NomErr<VerboseError<&str>>> {
+pub fn parse(input: &str) -> Result<Command<'_>, NomErr<VerboseError<&str>>> {
 	let res = command(input);
 	match res {
 		Ok(("", command)) => Ok(command),
