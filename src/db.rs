@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::zone_files;
-use color_eyre::eyre::{eyre, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr, eyre};
 use futures::StreamExt;
 use indoc::{formatdoc, indoc};
 use sqlx::{
-	sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
 	Pool, Row, Sqlite, Transaction,
+	sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
 };
 use std::path::{Path, PathBuf};
 use tldextract::TldExtractor;

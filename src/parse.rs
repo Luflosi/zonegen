@@ -4,7 +4,7 @@
 use nom::bytes::complete::take_while1;
 use nom::error::context;
 use nom::lib::std::result::Result::Err;
-use nom::{branch::alt, bytes::complete::tag, AsChar, Err as NomErr, IResult, Parser};
+use nom::{AsChar, Err as NomErr, IResult, Parser, branch::alt, bytes::complete::tag};
 use nom_language::error::{VerboseError, VerboseErrorKind};
 
 type Res<T, U> = IResult<T, U, VerboseError<T>>;
@@ -175,9 +175,9 @@ pub fn parse(input: &str) -> Result<Command<'_>, NomErr<VerboseError<&str>>> {
 
 #[cfg(test)]
 mod test {
-	use super::{add, command, delete, parse, Add, Command, Delete, Update};
-	use nom::error::ErrorKind;
+	use super::{Add, Command, Delete, Update, add, command, delete, parse};
 	use nom::Err as NomErr;
+	use nom::error::ErrorKind;
 	use nom_language::error::{VerboseError, VerboseErrorKind};
 
 	#[test]

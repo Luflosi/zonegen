@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2024 Luflosi <zonegen@luflosi.de>
 // SPDX-License-Identifier: GPL-3.0-only
 
-use atomic_write_file::{unix::OpenOptionsExt as AtomicOpenOptionsExt, AtomicWriteFile};
+use atomic_write_file::{AtomicWriteFile, unix::OpenOptionsExt as AtomicOpenOptionsExt};
 use color_eyre::eyre::{Result, WrapErr};
 use std::{fs, io::Write, os::unix::fs::OpenOptionsExt as UnixOpenOptionsExt, path::Path};
 
