@@ -59,7 +59,7 @@ fn tld_to_zone_and_subdomain(tld_ext: &TldExtractor, input: &str) -> Result<(Str
 		.suffix
 		.ok_or_else(|| eyre!("Cannot extract the suffix from the provided domain name: {input}"))?;
 	let zone = format!("{domain}.{suffix}");
-	let subdomain = tld.subdomain.map_or_else(|| "@".to_string(), |v| v);
+	let subdomain = tld.subdomain.unwrap_or_else(|| "@".to_string());
 
 	Ok((zone, subdomain))
 }
