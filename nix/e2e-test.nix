@@ -55,6 +55,12 @@ self:
       enable = true;
       forward = "only";
       forwarders = [];
+      # We refer to the file /var/lib/bind/zones/example.org/root.zone, which
+      # cannot be accessed from within the Nix sandbox. This causes the
+      # program, which checks the configuration, to think that the file
+      # does not exist, leading to an error.
+      # See https://github.com/NixOS/nixpkgs/pull/501959
+      checkConfig = false;
       extraOptions = ''
         empty-zones-enable no;
       '';
