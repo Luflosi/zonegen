@@ -17,7 +17,7 @@ futures = "0.3"
 indoc = "2.0"
 nom = "8.0"
 nom-language = "0.1"
-rustyline = "17.0"
+rustyline = "18.0"
 sqlx = { version = "0.8", features = [ "runtime-tokio", "sqlite" ] }
 tldextract = { git = "https://github.com/dovahcrow/tldextract-rs.git" }
 tokio = { version = "1", features = ["full"] }
