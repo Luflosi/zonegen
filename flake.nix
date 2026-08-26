@@ -131,14 +131,14 @@
           '';
 
         # NixOS tests don't run on macOS
-        } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+        } // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
           zonegen-e2e-test = pkgs.testers.runNixOSTest (import ./nix/e2e-test.nix self);
         };
 
         packages = {
           inherit zonegen;
           default = self.packages.${system}.zonegen;
-        } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+        } // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
           zonegen-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {
             inherit cargoArtifacts;
           });
