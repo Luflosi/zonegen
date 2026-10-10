@@ -2,7 +2,24 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 self:
-{ lib, pkgs, ... }: {
+{ lib, pkgs, ... }:
+let
+  zoneFile = pkgs.writeText "root.zone" ''
+    $ORIGIN example.org.
+    $TTL 3600
+    @ IN SOA ns.example.org. admin.example.org. ( 1 3h 1h 1w 1d )
+    @ IN NS ns.example.org.
+
+    ns IN A    127.0.0.1
+    ns IN AAAA ::1
+
+    1.0.0.127.in-addr.arpa IN PTR ns.example.org.
+    1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa IN PTR ns.example.org.
+
+    $INCLUDE /var/lib/bind/zones/dyn/example.org.zone
+  '';
+in
+{
   name = "zonegen";
   nodes.machine = { config, pkgs, ... }: {
     imports = [
@@ -32,22 +49,7 @@ self:
       group = "named";
     };
 
-    systemd.services.bind.preStart = let
-      zoneFile = pkgs.writeText "root.zone" ''
-        $ORIGIN example.org.
-        $TTL 3600
-        @ IN SOA ns.example.org. admin.example.org. ( 1 3h 1h 1w 1d )
-        @ IN NS ns.example.org.
-
-        ns IN A    127.0.0.1
-        ns IN AAAA ::1
-
-        1.0.0.127.in-addr.arpa IN PTR ns.example.org.
-        1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa IN PTR ns.example.org.
-
-        $INCLUDE /var/lib/bind/zones/dyn/example.org.zone
-      '';
-    in ''
+    systemd.services.bind.preStart = ''
       cp '${zoneFile}' '/var/lib/bind/zones/example.org/root.zone'
     '';
 
@@ -55,12 +57,18 @@ self:
       enable = true;
       forward = "only";
       forwarders = [];
-      # We refer to the file /var/lib/bind/zones/example.org/root.zone, which
-      # cannot be accessed from within the Nix sandbox. This causes the
-      # program, which checks the configuration, to think that the file
-      # does not exist, leading to an error.
-      # See https://github.com/NixOS/nixpkgs/pull/501959
-      checkConfig = false;
+      # The check is done in the Nix sandbox,
+      # where paths outside of the sandbox are not accessible.
+      # To avoid the check failing because it can't find some files,
+      # patch the configuration file.
+      preCheckConfig = ''
+        touch 'example.org.zone'
+        cp '${zoneFile}' 'root.zone'
+        substituteInPlace 'root.zone' \
+          --replace-fail '/var/lib/bind/zones/dyn/example.org.zone' "$PWD/example.org.zone"
+        substituteInPlace "$target" \
+          --replace-fail '/var/lib/bind/zones/example.org/root.zone' "$PWD/root.zone"
+      '';
       extraOptions = ''
         empty-zones-enable no;
       '';
